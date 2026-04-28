@@ -2,12 +2,13 @@
   "name": "hello-pear-cli",
   "version": "0.1.0",
   "description": "Pear Runtime CLI boilerplate using Bare with OTA updater support.",
-  "license": "MIT",
   "private": true,
-  "type": "commonjs",
   "main": "index.js",
   "upgrade": "pear://okug655xhy7g43cb1qyqhcdkgy7gtj9dowipogxx77mmirue4doo",
   "scripts": {
+    "format": "prettier . --write",
+    "test": "brittle-bare test/index.js",
+    "lint": "prettier . --check && lunte",
     "start": "bare index.js",
     "start:no-updates": "bare index.js --no-updates",
     "start:custom-storage": "bare index.js --storage /tmp/hello-pear-cli",
@@ -30,6 +31,19 @@
     "pear-runtime": "^1.1.1"
   },
   "devDependencies": {
-    "bare-build": "^0.5.3"
+    "bare-build": "^0.5.3",
+    "brittle": "^3.19.0",
+    "lunte": "^1.2.0",
+    "prettier": "^3.6.2",
+    "prettier-config-holepunch": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/holepunchto/hello-pear-cli.git"
+  },
+  "author": "Holepunch Inc",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/holepunchto/hello-pear-cli/issues"
   }
 }
