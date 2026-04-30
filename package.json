@@ -17,6 +17,7 @@
     "build:win32-x64": "bare-build --config ./bare-build.config.cjs --host win32-x64 --out ./out/win32-x64 index.js"
   },
   "dependencies": {
+    "bare-module-resolve": "file:../bare-module-resolve/bare-module-resolve-1.12.1.tgz",
     "bare-os": "^3.9.0",
     "bare-path": "^3.0.0",
     "bare-storage": "^1.1.0",

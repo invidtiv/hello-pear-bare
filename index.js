@@ -5,7 +5,7 @@ const os = require('bare-os')
 const path = require('bare-path')
 const Corestore = require('corestore')
 const Hyperswarm = require('hyperswarm')
-const PearRuntime = require('pear-runtime')
+const Updater = require('pear-runtime-updater')
 
 const appName = pkg.productName || pkg.name
 
@@ -44,7 +44,7 @@ function getRunningAppPath() {
 function getPear({ storage, updates, store, swarm }) {
   if (pear !== null) return pear
 
-  pear = new PearRuntime({
+  pear = new Updater({
     dir,
     app: getRunningAppPath(),
     updates,
@@ -60,19 +60,19 @@ function getPear({ storage, updates, store, swarm }) {
 
 pear = getPear({ storage, updates, store, swarm })
 if (updates !== false) {
-  pear.updater.on('updating', () => console.log('[updater] getting new update'))
+  pear.on('updating', () => console.log('[updater] getting new update'))
 
-  pear.updater.on('updating-delta', (d) => console.log('[updater]', d))
+  pear.on('updating-delta', (d) => console.log('[updater]', d))
 
-  pear.updater.on('updated', async () => {
+  pear.on('updated', async () => {
     console.log('[updater] update complete... appling')
-    await pear.updater.applyUpdate()
+    await pear.applyUpdate()
     console.log('[updater] applied update, restart to run latest version')
   })
 
   swarm.on('connection', (connection) => store.replicate(connection))
 
-  swarm.join(pear.updater.drive.core.discoveryKey, {
+  swarm.join(pear.drive.core.discoveryKey, {
     client: true,
     server: false
   })
@@ -82,32 +82,32 @@ pear.on('error', (err) => {
   console.error('[pear-runtime:error]', err)
 })
 
-const worker = PearRuntime.run('./workers/main.js')
+// const worker = PearRuntime.run('./workers/main.js')
 
-worker.stdout.on('data', (data) => {
-  console.log(`[worker:stdout] ${data}`)
-})
+// worker.stdout.on('data', (data) => {
+//   console.log(`[worker:stdout] ${data}`)
+// })
 
-worker.stderr.on('data', (data) => {
-  console.error(`[worker:stderr] ${data}`)
-})
+// worker.stderr.on('data', (data) => {
+//   console.error(`[worker:stderr] ${data}`)
+// })
 
-worker.on('data', (data) => {
-  console.log(`[worker:ipc] ${data}\n`)
-})
+// worker.on('data', (data) => {
+//   console.log(`[worker:ipc] ${data}\n`)
+// })
 
-worker.on('exit', (code) => {
-  console.log(`[worker] exited with code ${code}`)
-})
+// worker.on('exit', (code) => {
+//   console.log(`[worker] exited with code ${code}`)
+// })
 
-worker.write(Buffer.from(message))
+// worker.write(Buffer.from(message))
 
 let tearingDown = false
 async function teardown(code = 0) {
   if (tearingDown) return
   tearingDown = true
   try {
-    worker.destroy()
+    // worker.destroy()
   } catch {}
   try {
     await pear?.close()
