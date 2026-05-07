@@ -9,7 +9,7 @@
     "format": "prettier . --write",
     "test": "brittle-bare test/index.js",
     "lint": "prettier . --check && lunte",
-    "start": "bare index.js --no-updates",
+    "start": "bare bin.js --no-updates",
     "build:darwin-arm64": "bare-build --name hello-pear-bare --standalone --host darwin-arm64 --out ./out/darwin-arm64 bin.js",
     "build:darwin-x64": "bare-build --name hello-pear-bare --standalone --host darwin-x64 --out ./out/darwin-x64 bin.js",
     "build:linux-arm64": "bare-build --name hello-pear-bare --standalone --host linux-arm64 --out ./out/linux-arm64 bin.js",
