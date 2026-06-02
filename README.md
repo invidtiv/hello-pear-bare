@@ -79,6 +79,50 @@ npm start -- --message "hello from dev"
 
 ## Architecture
 
+`bin.js` is the happy path — your app logic. `lib/pear-cli.js` holds the
+boilerplate: storage resolution, pear-runtime construction, the OTA updater,
+swarm replication, signal handling and teardown. You rarely need to touch it.
+
+`createPearCli(pkg, opts)` returns a handle with `start(handler)` and
+`run(script, opts)`. Your handler receives `{ run, flags, pear, swarm, store, appName, dir }`.
+
+```js
+const createPearCli = require('./lib/pear-cli')
+const pkg = require('./package.json')
+
+const cli = createPearCli(pkg, {
+  flags: [['--message <text>', 'message sent to worker IPC stream']],
+  handlers: {
+    onUpdate: async ({ updater }) => {        // required
+      await updater.applyUpdate()
+      console.log('applied — restart to run the latest version')
+    }
+  }
+})
+
+cli.start(({ run, flags }) => {
+  const worker = run('./workers/main.js', { onData: (d) => console.log(`${d}`) })
+  worker.write(Buffer.from(flags.message || 'hello from cli main'))
+})
+```
+
+### Event handlers
+
+Handlers are passed to the constructor via `handlers`. One is required, the rest
+are optional and fall back to logging:
+
+| Handler | Required | Fires on |
+| --- | --- | --- |
+| `onUpdate({ updater, pear, ... })` | **yes** | a new version is ready — you decide whether/when to `applyUpdate()` and restart |
+| `onUpdating(ctx)` | no | an update download starts |
+| `onUpdatingDelta(delta, ctx)` | no | update download progress |
+| `onConnection(connection, ctx)` | no | a swarm peer connects (replication already runs; this augments it) |
+| `onError(err, ctx)` | no | a `pear-runtime` error |
+
+`onUpdate` is mandatory because applying an update and restarting is a product
+decision every CLI must make — the framework will not guess it for you. Leaving
+it out throws at startup.
+
 ### Updates
 
 Updates are handled through `pear-runtime` and the configured `upgrade` link in `package.json`.
@@ -91,7 +135,10 @@ npm start -- --no-updates
 
 ### Workers
 
-The main CLI runs a worker with `PearRuntime.run('./workers/main.js')` and communicates over IPC.
+`run('./workers/main.js')` spawns a Bare worker over `pear-runtime` and attaches
+default stdout/stderr/IPC/exit logging. Pass `{ onData, onStdout, onStderr, onExit }`
+to replace the default for any stream — `onData` is the worker's IPC channel and
+is usually where your app logic lives.
 
 ## Peer-to-Peer Deployments
 
@@ -115,7 +162,8 @@ Set the `upgrade` field in `package.json` to your distribution drive link, then 
 
 ## Project Structure
 
-- `bin.js` - CLI entrypoint and runtime wiring
+- `bin.js` - CLI entrypoint — your app logic and event handlers
+- `lib/pear-cli.js` - runtime/updater/swarm/teardown boilerplate (rarely edited)
 - `workers/main.js` - Bare worker example
 - `scripts/make.js` - platform/arch build target selector
 - `test/index.js` - brittle-bare tests
