@@ -14,6 +14,7 @@ End-to-end boilerplate for embedding [pear-runtime](https://github.com/holepunch
 - Requirements
 - Development
   - Install
+  - Create an upgrade link
   - Start
 - Architecture
   - Updates
@@ -41,6 +42,18 @@ End-to-end boilerplate for embedding [pear-runtime](https://github.com/holepunch
 ```sh
 npm install
 ```
+
+### Create an upgrade link
+
+This template expects `package.json` to contain a valid `pear://` link in the `upgrade` field. If it still contains the placeholder `pear://<YOUR_KEY_HERE>`, startup will fail with `INVALID_URL`.
+
+Create a link with [`pear touch`](https://docs.pears.com/reference/cli.html#pear-touch-flags-channel):
+
+```sh
+pear touch
+```
+
+Copy the generated `pear://...` link into the `upgrade` field in `package.json`.
 
 ### Start
 
@@ -108,6 +121,7 @@ Set the `upgrade` field in `package.json` to your distribution drive link, then 
 
 ## Troubleshooting
 
+- `INVALID_URL: Invalid URL 'pear://<YOUR_KEY_HERE>'` means the placeholder `upgrade` link in `package.json` has not been replaced. Run `pear touch`, then put the generated `pear://...` link in `package.json`.
 - If updates do not trigger, verify `package.json` contains a valid `upgrade` Pear link and that peers are seeding the target drive.
 - If `npm run make` fails on unsupported hosts, run a specific `make:<platform>-<arch>` script or build on a supported host.
 - This template does not implement app-level data persistence; it is a minimal CLI + updater example.
