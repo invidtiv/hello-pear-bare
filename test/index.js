@@ -6,6 +6,7 @@ require('./components')
 require('./viewport')
 require('./list')
 require('./style')
+require('./mouse')
 
 test('works', (t) => {
   t.pass()
