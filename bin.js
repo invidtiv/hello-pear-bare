@@ -3,7 +3,8 @@ const { quit, key, spinner, style } = require('./lib/tea')
 const pkg = require('./package.json')
 
 // A small live console: a spinner header, a scrolling feed of worker IPC and
-// wrapper log lines, and an input line you can type into and send to the worker.
+// wrapper log lines, and enter to ping the worker. This is the model the
+// Program drives — see lib/tea for the framework and examples/ for more.
 class App {
   constructor({ run, flags }) {
     this.spinner = spinner.create({ fps: 12 })
@@ -75,10 +76,7 @@ class App {
 }
 
 const cli = createPearCli(pkg, {
-  flags: [
-    ['--message <text>', 'message sent to worker IPC stream'],
-    ['--tui', 'run the interactive terminal UI']
-  ],
+  flags: [['--message <text>', 'message sent to worker IPC stream']],
   handlers: {
     // Required: decide what happens when a new version is ready.
     onUpdate: async ({ updater }) => {
@@ -91,16 +89,6 @@ const cli = createPearCli(pkg, {
   }
 })
 
-if (cli.flags.tui) {
-  // TUI mode: the wrapper hands signal control to the Program, routes its own
-  // logs and the worker's IPC into the model as Msgs, and closes pear on quit.
-  cli.tui(({ run, flags }) => new App({ run, flags }))
-} else {
-  // Classic mode: spawn a worker and log its IPC to the console.
-  cli.start(({ run, flags }) => {
-    const worker = run('./workers/main.js', {
-      onData: (data) => console.log(`[worker:ipc] ${data}`)
-    })
-    worker.write(Buffer.from(flags.message || 'hello from cli main'))
-  })
-}
+// Build the model and run it. The wrapper routes its own logs and the worker's
+// IPC into the model as Msgs, and closes pear when the model quits.
+cli.start(({ run, flags }) => new App({ run, flags }))
