@@ -1,29 +1,28 @@
 # hello-pear-bare
 
-> Pear Hello World for Bare CLI with `pear-runtime`
+> Pear Hello World for Standalone Bare Processes with `pear-runtime`
 
-End-to-end boilerplate for embedding [pear-runtime](https://github.com/holepunchto/pear-runtime) into a [Bare](https://github.com/holepunchto/bare) CLI with peer-to-peer OTA update support and standalone builds.
+End-to-end boilerplate for embedding [pear-runtime] into a Standalone [Bare] Process with peer-to-peer OTA update support.
 
-- Peer-to-Peer Over-the-Air updates
-- Bare worker process via `PearRuntime.run(...)`
-- Cross-platform standalone distributables via [`bare-build`](https://github.com/holepunchto/bare-build)
+- Peer-to-Peer deployment with [pear][pear-docs] CLI
+- Peer-to-Peer Over-the-Air updates with [`pear-runtime`][pear-runtime] module
+- Cross-platform standalone distributables via [`bare-build`][bare-build]
 
 ## Table of Contents
 
-- OS Support
-- Requirements
-- Development
-  - Install Dependencies
-  - Create an upgrade link
-  - Start
-- Architecture
-  - Updates
-  - Workers
-- Peer-to-Peer Deployments
-- Installing Distributables
-- Scripts
-- Project Structure
-- Troubleshooting
+- [OS Support](#os-support)
+- [Requirements](#requirements)
+- [Development](#development)
+  - [Install Dependencies](#install-dependencies)
+  - [Create an upgrade link](#create-an-upgrade-link)
+  - [Start](#start)
+- [Architecture](#architecture)
+  - [Updates](#updates)
+- [Peer-to-Peer Deployments](#peer-to-peer-deployments)
+- [Installing Distributables](#installing-distributables)
+- [Scripts](#scripts)
+- [Project Structure](#project-structure)
+- [Troubleshooting](#troubleshooting)
 
 ## OS Support
 
@@ -33,8 +32,8 @@ End-to-end boilerplate for embedding [pear-runtime](https://github.com/holepunch
 
 ## Requirements
 
-- `npm` via [Node.js](https://nodejs.org/)
-- [pear](https://docs.pears.com/) - `npx pear`
+- `npm` via [Nodejs]
+- [pear][pear-docs] - `npx pear`
 
 ## Development
 
@@ -84,19 +83,25 @@ Per-run disable updates:
 npm start -- --no-updates
 ```
 
-### Workers
-
-The main CLI runs a worker with `PearRuntime.run('./workers/main.js')` and communicates over IPC.
-
 ## Peer-to-Peer Deployments
+
+Use the [`pear`][pear-docs] CLI to deploy applications.
 
 Set the `upgrade` field in `package.json` to your distribution drive link, then follow the default flow from section 4 onward:
 
 [hello-pear-electron: 4. Build Deployment Directory and onward](https://github.com/holepunchto/hello-pear-electron#4-build-deployment-directory-)
 
+## Installing Distributables
+
+Once the `pear://<key>` upgrade link is seeding the build deployment folder the standalone binary can be installed peer-to-peer directly onto the system with Pear:
+
+```sh
+npx pear-install pear://<key>
+```
+
 ## Scripts
 
-- `npm start` - run the Bare CLI in dev mode (`bare bin.js --no-updates`)
+- `npm start` - run the Bare Process in dev mode (`bare bin.js --no-updates`)
 - `npm test` - run `brittle-bare` tests
 - `npm run lint` - run prettier check and lunte
 - `npm run format` - format repository with prettier
@@ -110,18 +115,9 @@ Set the `upgrade` field in `package.json` to your distribution drive link, then 
 
 ## Project Structure
 
-- `bin.js` - CLI entrypoint and runtime wiring
-- `workers/main.js` - Bare worker example
+- `bin.js` - entrypoint and runtime wiring
 - `scripts/make.js` - platform/arch build target selector
 - `test/index.js` - brittle-bare tests
-
-## Installing Distributables
-
-Once the `pear://<key>` upgrade link is seeding the build deployment folder the CLI standalone binary can be installed peer-to-peer directly onto the system with Pear:
-
-```sh
-npx pear-install pear://<key>
-```
 
 ## Troubleshooting
 
@@ -129,3 +125,11 @@ npx pear-install pear://<key>
 - If updates do not trigger, verify `package.json` contains a valid `upgrade` Pear link and that peers are seeding the target drive.
 - If `npm run make` fails on unsupported hosts, run a specific `make:<platform>-<arch>` script or build on a supported host.
 - This template does not implement app-level data persistence; it is a minimal CLI + updater example.
+
+<!-- Reference Links -->
+
+[pear-docs]: https://docs.pears.com
+[pear-runtime]: https://github.com/holepunchto/pear-runtime
+[Bare]: https://github.com/holepunchto/bare
+[nodejs]: https://nodejs.org
+[bare-build]: https://github.com/holepunchto/bare-build
