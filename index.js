@@ -4,7 +4,7 @@ const Hyperswarm = require('hyperswarm')
 const PearRuntime = require('pear-runtime')
 const ReadyResource = require('ready-resource')
 
-module.exports = class Updates extends ReadyResource {
+module.exports = class App extends ReadyResource {
   constructor({ dir, app, updates, version, upgrade, name }) {
     super()
 
