@@ -4,6 +4,8 @@
 
 End-to-end boilerplate for embedding [pear-runtime] into the [Bare] worker of a [Bare] CLI with peer-to-peer OTA update support.
 
+This boilerplate uses the companion [`hello-pear-worker`][hello-pear-worker] as a reusable cross-platform local backend. Keeping networking, storage and updates in a separate worker lets mobile apps, desktop UIs and standalone Bare applications share the same backend implementation while each parent owns its platform-specific interface.
+
 - Peer-to-Peer deployment with [pear][pear-docs] CLI
 - Peer-to-Peer Over-the-Air updates with [`pear-runtime`][pear-runtime] module
 - Bare worker process via `PearRuntime.run(...)`
@@ -144,6 +146,7 @@ npx pear-install pear://<key>
 <!-- Reference Links -->
 
 [pear-docs]: https://docs.pears.com
+[hello-pear-worker]: https://github.com/holepunchto/hello-pear-worker
 [pear-runtime]: https://github.com/holepunchto/pear-runtime
 [Bare]: https://github.com/holepunchto/bare
 [nodejs]: https://nodejs.org

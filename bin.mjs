@@ -1,4 +1,4 @@
-import { command, flag } from 'paparam'
+import { command, flag, summary } from 'paparam'
 import { persistent } from 'bare-storage'
 import process from 'bare-process'
 import os from 'bare-os'
@@ -8,21 +8,27 @@ import pkg from './package.json'
 import App from './app.js'
 
 const appName = pkg.productName || pkg.name
+const isDev = path.basename(Bare.argv[0]) === 'bare'
 
 const cmd = command(
   appName,
-  flag('--storage <dir>', 'custom storage directory for pear-runtime'),
+  summary(pkg.description),
+  flag('--version|-v', 'Print the current version'),
+  flag('--storage <dir>', 'custom storage directory'),
   flag('--no-updates', 'disable OTA updates for this run')
 )
 
-cmd.parse(Bare.argv.slice(2))
+cmd.parse(Bare.argv.slice(isDev ? 2 : 1))
+if (cmd.flags.help) Bare.exit()
+if (cmd.flags.version) {
+  console.log(`${appName} v${pkg.version}`)
+  Bare.exit()
+}
 
 const updates = cmd.flags.updates
-const isDev = path.basename(Bare.argv[0]) === 'bare'
 const storage = cmd.flags.storage || (isDev ? null : path.join(persistent(), appName))
 const dir = storage || path.join(os.tmpdir(), 'pear', appName)
 
-console.log(`${appName} v${pkg.version}`)
 console.log(`Updates: ${updates === false ? 'disabled' : 'enabled'}`)
 
 const app = new App({
@@ -53,6 +59,5 @@ try {
   console.log('\nCLI ready. Press Ctrl+C to stop.\n')
 } catch (err) {
   console.error('[app:error]', err)
-  await app.close().catch(() => {})
-  Bare.exit(1)
+  await app.close().finally(() => Bare.exit(1))
 }
